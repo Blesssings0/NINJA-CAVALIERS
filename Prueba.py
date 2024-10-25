@@ -4,6 +4,8 @@ import constantes
 import os
 from personaje import Personaje
 from Enemigos import Enemigo
+from Mapa import Mundo
+
 
 #ESCALAR LA IMAGEN
 def scalar_imagen(image,scale):
@@ -23,17 +25,6 @@ def name_carpeta(directorio):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 # pygame setup
 pygame.init()
 reloj = pygame.time.Clock()
@@ -47,12 +38,69 @@ Mover_arriba = False
 Mover_abajo = False
 
 running = True
-
 pygame.display.set_caption("Mi primer Juego")
 
 
 
-#Impostando Imagenes del personaje
+
+
+# Función para dibujar el mapa con colores
+# Función para dibujar la cuadrícula
+# Función para dibujar la grid del mapa con líneas
+def dibujar_grid():
+    
+      # Dibujar las líneas verticales
+    for x in range(30):  # +1 para dibujar la última línea
+        pygame.draw.line(screen, constantes.COLOR_LINEA, (x*constantes.Tile_Size, 0), (x*constantes.Tile_Size, constantes.HEIGHT))  # Línea vertical
+        pygame.draw.line(screen, constantes.COLOR_LINEA, (0 ,x *constantes.Tile_Size), (constantes.WIDTH, x*40 ))  # Línea horizontal
+
+
+
+
+#FUNCION PARA CARGAR LAS IMAGENES DEL MUNDO
+# FUNCION PARA CARGAR LAS IMAGENES DEL MUNDO
+tile_list = []
+
+for x in range(constantes.Tiles_Type):
+    tile_image = pygame.image.load(f"Assets/Tiles/Tile ({x+1}).png")
+    # Corregido a solo dos dimensiones (ancho y alto)
+    tile_image = pygame.transform.scale(tile_image, (constantes.Tile_Size, constantes.Tile_Size))
+    tile_list.append(tile_image)
+
+world_data = [
+    [0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
+    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
+    [16, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
+    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
+    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
+    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
+    [16, 8, 8, 8, 16, 8, 8, 8, 8, 8, 18, 8, 8, 8, 8, 8, 11],
+    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
+    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
+    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
+    [16, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,  11]
+]
+
+world = Mundo()
+world.proceso_datos(world_data, tile_list)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Vida del Jugador principal
+
+
+
 #ANIMACION DEL PERSONAJE
 animaciones = []
 for i in range (7):
@@ -95,9 +143,14 @@ cavalier = Enemigo(300, 400, animaciones_enemigo)
 Lanzador = Enemigo(100, 250, animaciones_enemigo2 )
 
 
+
 while running:
     # FRAME A 60 FPS
     reloj.tick(60)
+    
+    
+
+
 
     # MOVIMIENTO DEL JUGADOR
     posicion_x = 0
@@ -152,10 +205,11 @@ while running:
             
 
     # Dibujar elementos en pantalla
+    world.draw(screen)
     Jugador.dibujar(screen)
     cavalier.dibujar(screen)
     Lanzador.dibujar(screen)
-
+    dibujar_grid()
     
     
     # Manejar eventos
