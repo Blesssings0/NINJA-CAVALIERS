@@ -9,22 +9,22 @@ from Coliciones import ajustar_colision
 import csv
 
 
-#ESCALAR LA IMAGEN
-def scalar_imagen(image,scale):
+# ESCALAR LA IMAGEN
+def scalar_imagen(image, scale):
     w = image.get_width()
     h = image.get_height()
-    nueva_imagen = pygame.transform.scale(image,(w*scale, h*scale))
+    nueva_imagen = pygame.transform.scale(image, (w*scale, h*scale))
     return nueva_imagen
 
 
-#CONTAR ELEMENTOS EN CARPETA
+# CONTAR ELEMENTOS EN CARPETA
 def Contar_elementos(directorio):
     return len(os.listdir(directorio))
-#LISTAR NOMBRES DE LAS CARPETAS
+# LISTAR NOMBRES DE LAS CARPETAS
+
 
 def name_carpeta(directorio):
     return os.listdir(directorio)
-
 
 
 # pygame setup
@@ -33,6 +33,10 @@ reloj = pygame.time.Clock()
 
 screen = pygame.display.set_mode((constantes.WIDTH, constantes.HEIGHT))
 
+# Load the background image
+background_image = pygame.image.load("Assets/MUNDO/download.png")
+background_image = pygame.transform.scale(
+    background_image, (constantes.WIDTH, constantes.HEIGHT))
 
 Mover_derecha = False
 Mover_izquierda = False
@@ -43,124 +47,101 @@ running = True
 pygame.display.set_caption("Mi primer Juego")
 
 
-
-
-
-
 # # # Función para dibujar el mapa con colores
 # # # Función para dibujar la cuadrícula
 # # # Función para dibujar la grid del mapa con líneas
 # def dibujar_grid():
-    
+
 #          #Dibujar las líneas verticales
 #     for x in range(30):  # +1 para dibujar la última línea
 #              pygame.draw.line(screen, constantes.COLOR_LINEA, (x*constantes.Tile_Size, 0), (x*constantes.Tile_Size, constantes.HEIGHT))  # Línea vertical
 #              pygame.draw.line(screen, constantes.COLOR_LINEA, (0 ,x *constantes.Tile_Size), (constantes.WIDTH, constantes.Tile_Size ))  # Línea horizontal
 
 
+# FUNCIÓN PARA CARGAR LAS IMAGENES DEL MUNDO
+# FUNCIÓN PARA CARGAR LAS IMAGENES DEL MUNDO
+tile_list: list[str] = []
 
-
-#FUNCION PARA CARGAR LAS IMAGENES DEL MUNDO
-# FUNCION PARA CARGAR LAS IMAGENES DEL MUNDO
-tile_list = []
-
-for x in range(constantes.Tiles_Type):
-    tile_image = pygame.image.load(f"Assets/MUNDO/Tile ({x+1}).png")
-    # Corregido a solo dos dimensiones (ancho y alto)
-    tile_image = pygame.transform.scale(tile_image, (constantes.Tile_Size, constantes.Tile_Size))
-    tile_list.append(tile_image)
+tile_image = pygame.image.load("Assets/MUNDO/download.png")
+# Corregido a solo dos dimensiones (ancho y alto)
+tile_image = pygame.transform.scale(
+    tile_image, (constantes.Tile_Size, constantes.Tile_Size))
 
 world_data = []
-
 
 
 for filas in range(constantes.FILAS):
     fila = [6] * (constantes.COLUMNAS)
     world_data.append(fila)
 
-with open ("CSV/csvp1.csv", newline='') as csvfile:
+    """
+    with open("CSV/csvp1.csv", newline='') as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
     for x, fila in enumerate(reader):
         for y, columna in enumerate(fila):
             world_data[x][y] = int(columna)
-    
-    
+    """
+
+# world = Mundo(constantes.WIDTH, constantes.HEIGHT, "Assets/MUNDO/download.png")
+world = Mundo(constantes.WIDTH, constantes.HEIGHT,
+              "Assets/MUNDO/download2.png")
+# world.proceso_datos(world_data, tile_list)
 
 
-world = Mundo()
-world.proceso_datos( world_data, tile_list  )
+# Vida del Jugador principal
 
 
-
-
-
-
-
-
-
-
-
-
-#Vida del Jugador principal
-
-
-
-#ANIMACION DEL PERSONAJE
+# ANIMACION DEL PERSONAJE
 animaciones = []
-for i in range (7):
-     img = pygame.image.load(f"Assets//Walk//{i}.png")
-     img =scalar_imagen(img,constantes.Scala_personaje)
-     animaciones.append(img)
-     
-#ANIMACION DE ATAQUE
+for i in range(7):
+    img = pygame.image.load(f"Assets//Walk//{i}.png")
+    img = scalar_imagen(img, constantes.Scala_personaje)
+    animaciones.append(img)
+
+# ANIMACION DE ATAQUE
 animaciones_ataque = []
 for enemigos in range(3):  # Suponiendo que tienes 5 frames de ataque
     img_ataque = pygame.image.load(f"Assets/Attack_3/{enemigos}.png")
     img_ataque = scalar_imagen(img_ataque, constantes.Scala_personaje)
     animaciones_ataque.append(img_ataque)
 
-#Animacion DEL ENEMIGO
-animaciones_enemigo =[]
+# Animacion DEL ENEMIGO
+animaciones_enemigo = []
 for a_enemigo in range(7):
     img_enemigo = pygame.image.load(f"Assets/Enemy/Cavalier/{a_enemigo}.png")
     img_enemigo = scalar_imagen(img_enemigo, constantes.Escalar_enemigos)
     animaciones_enemigo.append(img_enemigo)
 
-#ANIMACION DEL LANZADOR
-animaciones_enemigo2 =[]
+# ANIMACION DEL LANZADOR
+animaciones_enemigo2 = []
 for a_enemigo in range(7):
     img_enemigo2 = pygame.image.load(f"Assets/Enemy/Lanzador/{a_enemigo}.png")
     img_enemigo2 = scalar_imagen(img_enemigo2, constantes.Escalar_enemigos)
     animaciones_enemigo2.append(img_enemigo2)
 
-animaciones_enemigo3 =[]
+animaciones_enemigo3 = []
 for soldier in range(6):
-    img_enemigo3 = pygame.image.load(f"Assets/Enemy/Soldier/{soldier +1}.png")
+    img_enemigo3 = pygame.image.load(f"Assets/Enemy/Soldier/{soldier + 1}.png")
     img_enemigo3 = scalar_imagen(img_enemigo3, constantes.Escalar_enemigos)
     animaciones_enemigo3.append(img_enemigo3)
-   
-    
-    
-#CREAR JUGADOR
+
+
+# CREAR JUGADOR
 Jugador = Personaje(70, 70, animaciones, animaciones_ataque)
 
 
-#Creando ENEMIGOS
+# Creando ENEMIGOS
 cavalier = Enemigo(300, 400, animaciones_enemigo)
 
 
-Lanzador = Enemigo(100, 250, animaciones_enemigo2 )
+Lanzador = Enemigo(100, 250, animaciones_enemigo2)
 
-Soldier = Enemigo(400, 450, animaciones_enemigo3 )
+Soldier = Enemigo(400, 450, animaciones_enemigo3)
 
 
 while running:
     # FRAME A 60 FPS
     reloj.tick(60)
-    
-    
-
-
 
     # MOVIMIENTO DEL JUGADOR
     posicion_x = 0
@@ -175,7 +156,7 @@ while running:
         posicion_y = -constantes.Velocidad_Personaje
     if Mover_abajo:
         posicion_y = constantes.Velocidad_Personaje
-        
+
     # Actualiza los frames de los personajes y enemigos
     Jugador.Update_Frame()
     cavalier.Update_Frame()
@@ -184,13 +165,11 @@ while running:
 
     # Control del jugador en los ejes X e Y
     Jugador.movimiento(posicion_x, posicion_y)
-   
-        # Detectar colisiones y daño
+
+    # Detectar colisiones y daño
     if Jugador.atacando:
         Jugador.atacar(cavalier)
         Jugador.atacar(Lanzador)
-        
-    
 
     # Detectar colisiones y ajustar el movimiento
     if Jugador.forma.colliderect(cavalier.forma):
@@ -214,17 +193,16 @@ while running:
             Jugador.forma.bottom = Lanzador.forma.top
         elif posicion_y < 0:  # Se mueve hacia arriba
             Jugador.forma.top = Lanzador.forma.bottom
-            
 
     # Dibujar elementos en pantalla
+    screen.blit(background_image, (0, 0))  # Draw the background image
     world.draw(screen)
     Jugador.dibujar(screen)
     cavalier.dibujar(screen)
     Lanzador.dibujar(screen)
     Soldier.dibujar(screen)
     # dibujar_grid()
-    
-    
+
     # Manejar eventos
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -242,7 +220,6 @@ while running:
             if event.key == pygame.K_a:  # Tecla de ataque
                 Jugador.atacando = True
                 Jugador.frame_index = 0
-                            
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_UP:
@@ -257,5 +234,5 @@ while running:
     # Actualizar la pantalla
     pygame.display.update()
     screen.fill((0, 0, 0))  # Limpiamos la pantalla
-    
+
 pygame.quit()
