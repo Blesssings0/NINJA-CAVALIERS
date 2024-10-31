@@ -222,7 +222,7 @@ while running:
     cavalier.dibujar(screen)
     Lanzador.dibujar(screen)
     Soldier.dibujar(screen)
-    dibujar_grid()
+    # dibujar_grid()
     
     
     # Manejar eventos
