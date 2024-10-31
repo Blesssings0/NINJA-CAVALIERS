@@ -5,6 +5,8 @@ import os
 from personaje import Personaje
 from Enemigos import Enemigo
 from Mapa import Mundo
+from Coliciones import ajustar_colision
+import csv
 
 
 #ESCALAR LA IMAGEN
@@ -47,12 +49,12 @@ pygame.display.set_caption("Mi primer Juego")
 # Función para dibujar el mapa con colores
 # Función para dibujar la cuadrícula
 # Función para dibujar la grid del mapa con líneas
-def dibujar_grid():
+# # def dibujar_grid():
     
-      # Dibujar las líneas verticales
-    for x in range(30):  # +1 para dibujar la última línea
-        pygame.draw.line(screen, constantes.COLOR_LINEA, (x*constantes.Tile_Size, 0), (x*constantes.Tile_Size, constantes.HEIGHT))  # Línea vertical
-        pygame.draw.line(screen, constantes.COLOR_LINEA, (0 ,x *constantes.Tile_Size), (constantes.WIDTH, x*40 ))  # Línea horizontal
+#       # Dibujar las líneas verticales
+#     for x in range(30):  # +1 para dibujar la última línea
+#         pygame.draw.line(screen, constantes.COLOR_LINEA, (x*constantes.Tile_Size, 0), (x*constantes.Tile_Size, constantes.HEIGHT))  # Línea vertical
+#         pygame.draw.line(screen, constantes.COLOR_LINEA, (0 ,x *constantes.Tile_Size), (constantes.WIDTH, x*40 ))  # Línea horizontal
 
 
 
@@ -62,29 +64,30 @@ def dibujar_grid():
 tile_list = []
 
 for x in range(constantes.Tiles_Type):
-    tile_image = pygame.image.load(f"Assets/Tiles/Tile ({x+1}).png")
+    tile_image = pygame.image.load(f"Assets/PRUBITAS/Tile ({x+1}).png")
     # Corregido a solo dos dimensiones (ancho y alto)
     tile_image = pygame.transform.scale(tile_image, (constantes.Tile_Size, constantes.Tile_Size))
     tile_list.append(tile_image)
 
-world_data = [
-    [0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
-    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
-    [16, 8, 8, 8, 8, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
-    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
-    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
-    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
-    [16, 8, 8, 8, 16, 8, 8, 8, 8, 8, 18, 8, 8, 8, 8, 8, 11],
-    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
-    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
-    [16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11],
-    [16, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,  11]
-]
+world_data = []
+
+
+
+for filas in range(constantes.FILAS):
+    fila = [6] * (constantes.COLUMNAS)
+    world_data.append(fila)
+
+with open ("CSV/csvp1.csv", newline='') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',')
+    for x, fila in enumerate(reader):
+        for y, columna in enumerate(fila):
+            world_data[x][y] = int(columna)
+    
+    
+
 
 world = Mundo()
-world.proceso_datos(world_data, tile_list)
-
-
+world.proceso_datos( world_data, tile_list  )
 
 
 
@@ -129,6 +132,11 @@ for a_enemigo in range(7):
     img_enemigo2 = scalar_imagen(img_enemigo2, constantes.Escalar_enemigos)
     animaciones_enemigo2.append(img_enemigo2)
 
+animaciones_enemigo3 =[]
+for soldier in range(6):
+    img_enemigo3 = pygame.image.load(f"Assets/Enemy/Soldier/{soldier +1}.png")
+    img_enemigo3 = scalar_imagen(img_enemigo3, constantes.Escalar_enemigos)
+    animaciones_enemigo3.append(img_enemigo3)
    
     
     
@@ -142,6 +150,7 @@ cavalier = Enemigo(300, 400, animaciones_enemigo)
 
 Lanzador = Enemigo(100, 250, animaciones_enemigo2 )
 
+Soldier = Enemigo(400, 450, animaciones_enemigo3 )
 
 
 while running:
@@ -170,6 +179,7 @@ while running:
     Jugador.Update_Frame()
     cavalier.Update_Frame()
     Lanzador.Update_Frame()
+    Soldier.Update_Frame()
 
     # Control del jugador en los ejes X e Y
     Jugador.movimiento(posicion_x, posicion_y)
@@ -178,7 +188,8 @@ while running:
     if Jugador.atacando:
         Jugador.atacar(cavalier)
         Jugador.atacar(Lanzador)
-
+        
+    
 
     # Detectar colisiones y ajustar el movimiento
     if Jugador.forma.colliderect(cavalier.forma):
@@ -209,7 +220,8 @@ while running:
     Jugador.dibujar(screen)
     cavalier.dibujar(screen)
     Lanzador.dibujar(screen)
-    dibujar_grid()
+    Soldier.dibujar(screen)
+    # dibujar_grid()
     
     
     # Manejar eventos
