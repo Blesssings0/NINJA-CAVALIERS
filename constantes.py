@@ -18,7 +18,7 @@ Scala_personaje = 0.8
 
 Escalar_enemigos = 0.8
 Alto_ENEMIGO = 10
-Ancho_ENEMIGO = 10
+Ancho_ENEMIGO = 50
 
 
 
@@ -26,6 +26,6 @@ Ancho_ENEMIGO = 10
 COLOR_LINEA = (255, 255, 255)  # Color blanco para las líneas de los tiles
 
 Tiles_Type = 1600
-Tile_Size = 10# Tamaño del tile (puede ser ajustado según el diseño)
-FILAS = 42
+Tile_Size = 50# Tamaño del tile (puede ser ajustado según el diseño)
+FILAS = 50
 COLUMNAS = 50

@@ -46,15 +46,16 @@ pygame.display.set_caption("Mi primer Juego")
 
 
 
-# Función para dibujar el mapa con colores
-# Función para dibujar la cuadrícula
-# Función para dibujar la grid del mapa con líneas
-# # def dibujar_grid():
+
+# # # Función para dibujar el mapa con colores
+# # # Función para dibujar la cuadrícula
+# # # Función para dibujar la grid del mapa con líneas
+# def dibujar_grid():
     
-#       # Dibujar las líneas verticales
+#          #Dibujar las líneas verticales
 #     for x in range(30):  # +1 para dibujar la última línea
-#         pygame.draw.line(screen, constantes.COLOR_LINEA, (x*constantes.Tile_Size, 0), (x*constantes.Tile_Size, constantes.HEIGHT))  # Línea vertical
-#         pygame.draw.line(screen, constantes.COLOR_LINEA, (0 ,x *constantes.Tile_Size), (constantes.WIDTH, x*40 ))  # Línea horizontal
+#              pygame.draw.line(screen, constantes.COLOR_LINEA, (x*constantes.Tile_Size, 0), (x*constantes.Tile_Size, constantes.HEIGHT))  # Línea vertical
+#              pygame.draw.line(screen, constantes.COLOR_LINEA, (0 ,x *constantes.Tile_Size), (constantes.WIDTH, constantes.Tile_Size ))  # Línea horizontal
 
 
 
@@ -221,7 +222,7 @@ while running:
     cavalier.dibujar(screen)
     Lanzador.dibujar(screen)
     Soldier.dibujar(screen)
-    # dibujar_grid()
+    dibujar_grid()
     
     
     # Manejar eventos
