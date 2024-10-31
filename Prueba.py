@@ -65,7 +65,7 @@ pygame.display.set_caption("Mi primer Juego")
 tile_list = []
 
 for x in range(constantes.Tiles_Type):
-    tile_image = pygame.image.load(f"Assets/PRUBITAS/Tile ({x+1}).png")
+    tile_image = pygame.image.load(f"Assets/MUNDO/Tile ({x+1}).png")
     # Corregido a solo dos dimensiones (ancho y alto)
     tile_image = pygame.transform.scale(tile_image, (constantes.Tile_Size, constantes.Tile_Size))
     tile_list.append(tile_image)
