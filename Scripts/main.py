@@ -16,9 +16,9 @@ animaciones, animaciones_ataque, animaciones_enemigo, animaciones_enemigo2, anim
 
 # Inicializar otros elementos del juego
 world = Mundo(constantes.WIDTH, constantes.HEIGHT, "Assets/MUNDO/battleground2.png")
-Jugador = Personaje(100, 100, animaciones, animaciones_ataque)  # Inicializar el jugador
+Jugador = Personaje(50, 50, animaciones, animaciones_ataque)  # Inicializar el jugador
 cavalier = Enemigo(200, 200, animaciones_enemigo)  # Inicializar el cavalier
-Lanzador = Enemigo(300, 300, animaciones_enemigo2)  # Inicializar el lanzador
+Lanzador = Enemigo(200, 500, animaciones_enemigo2)  # Inicializar el lanzador
 Soldier = Enemigo(400, 400, animaciones_enemigo3)  # Inicializar el soldier
 
 # Inicializar posiciones
@@ -46,7 +46,7 @@ while running:
         posicion_x += constantes.Velocidad_Personaje
 
     # Lógica del juego
-    manejar_colisiones(Jugador, cavalier, Lanzador, Soldier, posicion_x, posicion_y)
+    manejar_colisiones(Jugador, cavalier, Lanzador, Soldier, world, posicion_x, posicion_y)
     
     # Dibujar elementos
     dibujar_elementos(screen, background_image, world, Jugador, cavalier, Lanzador, Soldier)
@@ -58,16 +58,16 @@ while running:
     Lanzador.Update_Frame()
 
     # Control del jugador en los ejes X e Y
-    Jugador.movimiento(posicion_x, posicion_y)
+    Jugador.movimiento(posicion_x, posicion_y, world.grilla)
 
     # Manejar ataque
     if atacando:
         Jugador.atacar([cavalier, Lanzador, Soldier])
 
     # Enemigos buscan camino hacia el jugador
-    cavalier.buscar_camino(world.grilla, Jugador.forma.center)
-    Lanzador.buscar_camino(world.grilla, Jugador.forma.center)
-    Soldier.buscar_camino(world.grilla, Jugador.forma.center)
+    cavalier.perseguir_jugador(world.grilla, Jugador)
+    Lanzador.perseguir_jugador(world.grilla, Jugador)
+    Soldier.perseguir_jugador(world.grilla, Jugador)
 
     # Enemigos siguen el camino
     cavalier.seguir_camino()

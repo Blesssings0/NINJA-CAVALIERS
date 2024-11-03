@@ -14,6 +14,7 @@ def dibujar_elementos(screen, background_image, world, Jugador, cavalier, Lanzad
     cavalier.dibujar(screen)
     Lanzador.dibujar(screen)
     Soldier.dibujar(screen)
+    # dibujar_colisiones(screen, world.grilla)  # Dibujar colisiones
     # dibujar_grid()
 
 def manejar_eventos(Mover_arriba, Mover_abajo, Mover_izquierda, Mover_derecha, Jugador, enemigos):
