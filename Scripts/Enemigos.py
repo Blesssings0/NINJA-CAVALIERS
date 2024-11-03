@@ -2,9 +2,10 @@
 import pygame
 import constantes
 from astar import astar
+from search_algorithms import bfs, dfs, bidirectional_search
 
 class Enemigo:
-    def __init__(self, x, y, animaciones):
+    def __init__(self, x, y, animaciones, algoritmo='astar'):
         # Inicializa el enemigo con su posición, animaciones y velocidad
         self.flip = False  # Indica si el sprite debe ser volteado horizontalmente
         self.animaciones = animaciones  # Lista de animaciones del enemigo
@@ -16,6 +17,7 @@ class Enemigo:
         self.salud = 100  # Salud del enemigo
         self.camino = []  # Lista de posiciones que forman el camino a seguir
         self.velocidad = constantes.Velocidad_Enemigo  # Utilizar la constante Velocidad_Enemigo
+        self.algoritmo = algoritmo  # Algoritmo de búsqueda a utilizar
 
     def dibujar(self, interfaz):
         # Dibuja el enemigo en la interfaz
@@ -68,10 +70,17 @@ class Enemigo:
             print("¡Enemigo derrotado!")
 
     def buscar_camino(self, grilla, objetivo):
-        # Calcula el camino hacia el objetivo usando el algoritmo A*
+        # Calcula el camino hacia el objetivo usando el algoritmo seleccionado
         inicio = (self.forma.centerx // constantes.Tile_Size, self.forma.centery // constantes.Tile_Size)
         objetivo = (objetivo[0] // constantes.Tile_Size, objetivo[1] // constantes.Tile_Size)
-        self.camino = astar(grilla, inicio, objetivo)
+        if self.algoritmo == 'astar':
+            self.camino = astar(grilla, inicio, objetivo)
+        elif self.algoritmo == 'bfs':
+            self.camino = bfs(grilla, inicio, objetivo)
+        elif self.algoritmo == 'dfs':
+            self.camino = dfs(grilla, inicio, objetivo)
+        elif self.algoritmo == 'bidirectional':
+            self.camino = bidirectional_search(grilla, inicio, objetivo)
 
     def seguir_camino(self):
         # Sigue el camino calculado hacia el objetivo
