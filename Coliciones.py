@@ -1,21 +1,21 @@
-# Función para ajustar la posición del jugador en caso de colisión
-def ajustar_colision(jugador, enemigo):
-    if jugador.forma.colliderect(enemigo.forma):
-        # Determinar la distancia de colisión en X y Y
-        dx = (jugador.forma.centerx - enemigo.forma.centerx)
-        dy = (jugador.forma.centery - enemigo.forma.centery)
-        
-        # La separación mínima necesaria para evitar la colisión
-        overlap_x = (jugador.forma.width / 2 + enemigo.forma.width / 2) - abs(dx)
-        overlap_y = (jugador.forma.height / 2 + enemigo.forma.height / 2) - abs(dy)
+# Coliciones.py
+def manejar_colisiones(Jugador, cavalier, Lanzador, Soldier, posicion_x, posicion_y):
+    separar_objetos(Jugador, cavalier)
+    separar_objetos(Jugador, Lanzador)
+    separar_objetos(Jugador, Soldier)
 
-        if overlap_x < overlap_y:  # Colisión más fuerte en X
-            if dx > 0:  # Jugador está a la derecha del enemigo
-                jugador.forma.right = enemigo.forma.left
-            else:  # Jugador está a la izquierda del enemigo
-                jugador.forma.left = enemigo.forma.right
-        else:  # Colisión más fuerte en Y
-            if dy > 0:  # Jugador está por debajo del enemigo
-                jugador.forma.bottom = enemigo.forma.top
-            else:  # Jugador está por encima del enemigo
-                jugador.forma.top = enemigo.forma.bottom
+def separar_objetos(Jugador, objeto):
+    # Empuja al jugador fuera del objeto en caso de colisión
+    if Jugador.forma.colliderect(objeto.forma):
+        dx = (Jugador.forma.centerx - objeto.forma.centerx)
+        dy = (Jugador.forma.centery - objeto.forma.centery)
+        if abs(dx) > abs(dy):
+            if dx > 0:
+                Jugador.forma.left = objeto.forma.right
+            else:
+                Jugador.forma.right = objeto.forma.left
+        else:
+            if dy > 0:
+                Jugador.forma.top = objeto.forma.bottom
+            else:
+                Jugador.forma.bottom = objeto.forma.top
