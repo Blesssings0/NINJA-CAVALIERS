@@ -18,9 +18,14 @@ animaciones, animaciones_ataque, animaciones_enemigo, animaciones_enemigo2, anim
 # Inicializar otros elementos del juego
 world = Mundo(constantes.WIDTH, constantes.HEIGHT, "Assets/MUNDO/battleground2.png")
 Jugador = Personaje(30, 30, animaciones, animaciones_ataque)  # Inicializar el jugador
-cavalier = Enemigo(140, 100, animaciones_enemigo)  # Inicializar el cavalier
+cavalier = Enemigo(150, 125, animaciones_enemigo)  # Inicializar el cavalier
 Lanzador = Enemigo(300, 455, animaciones_enemigo2)  # Inicializar el lanzador
 Soldier = Enemigo(250, 300, animaciones_enemigo3)  # Inicializar el soldier
+
+# Asignar referencias al jugador y la grilla en los enemigos
+for enemigo in [cavalier, Lanzador, Soldier]:
+    enemigo.jugador = Jugador
+    enemigo.grilla = world.grilla
 
 # Inicializar posiciones
 posicion_x = 0  # Inicializar la posición x
@@ -79,11 +84,7 @@ while running:
 
     # Enemigos buscan camino hacia el jugador
     for enemigo in enemigos:
-        enemigo.perseguir_jugador(world.grilla, Jugador)
-        enemigo.seguir_camino()
-
-    # Eliminar enemigos derrotados
-    enemigos = [enemigo for enemigo in enemigos if enemigo.forma]
+        enemigo.actualizar_comportamiento()
 
     pygame.display.flip()
     reloj.tick(60)

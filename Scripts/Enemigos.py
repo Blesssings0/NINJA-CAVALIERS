@@ -2,6 +2,7 @@
 import pygame
 import constantes
 from astar import astar
+from behavior_tree import Selector, Sequence, Action
 
 class Enemigo:
     def __init__(self, x, y, animaciones):
@@ -15,6 +16,21 @@ class Enemigo:
         self.salud = 100
         self.camino = []
         self.velocidad = constantes.Velocidad_Enemigo
+        self.jugador = None  # Referencia al jugador
+        self.grilla = None  # Referencia a la grilla del mapa
+
+        # Definir el árbol de comportamiento
+        self.behavior_tree = Selector([
+            Sequence([
+                Action(self.detectar_jugador),
+                Action(self.perseguir_jugador)
+            ]),
+            Action(self.patrullar)
+        ])
+
+        # Definir puntos de patrullaje
+        self.puntos_patrullaje = [(x, y), (x + 100, y), (x + 100, y + 100), (x, y + 100)]
+        self.punto_actual = 0
 
     def dibujar(self, interfaz):
         if self.forma:  # Solo dibujar si el enemigo no ha sido eliminado
@@ -75,16 +91,37 @@ class Enemigo:
 
     def seguir_camino(self):
         if self.forma and self.camino:  # Solo seguir camino si el enemigo no ha sido eliminado
-            siguiente = self.camino.pop(0)
-            self.forma.center = (siguiente[0] * constantes.Tile_Size + constantes.Tile_Size // 2,
-                                 siguiente[1] * constantes.Tile_Size + constantes.Tile_Size // 2)
+            siguiente = self.camino[0]
+            dx = siguiente[0] * constantes.Tile_Size + constantes.Tile_Size // 2 - self.forma.centerx
+            dy = siguiente[1] * constantes.Tile_Size + constantes.Tile_Size // 2 - self.forma.centery
+            distancia = (dx ** 2 + dy ** 2) ** 0.5
+            if distancia < self.velocidad:
+                self.forma.center = (siguiente[0] * constantes.Tile_Size + constantes.Tile_Size // 2,
+                                     siguiente[1] * constantes.Tile_Size + constantes.Tile_Size // 2)
+                self.camino.pop(0)
+            else:
+                self.movimiento(dx / distancia * max(self.velocidad, 1), dy / distancia * max(self.velocidad, 1), self.grilla)
 
-    def perseguir_jugador(self, grilla, jugador):
-        if self.forma:  # Solo perseguir si el enemigo no ha sido eliminado
-            distancia = ((self.forma.centerx - jugador.forma.centerx) ** 2 + (self.forma.centery - jugador.forma.centery) ** 2) ** 0.5
-            if distancia < 200:  # Distancia de detección
-                self.buscar_camino(grilla, jugador.forma.center)
-                if self.forma.centerx < jugador.forma.centerx:
-                    self.flip = False
-                else:
-                    self.flip = True
+    def detectar_jugador(self):
+        # Detectar si el jugador está cerca
+        distancia = ((self.forma.centerx - self.jugador.forma.centerx) ** 2 + (self.forma.centery - self.jugador.forma.centery) ** 2) ** 0.5
+        return distancia < 70  # Distancia de detección
+
+    def perseguir_jugador(self):
+        # Perseguir al jugador
+        self.buscar_camino(self.grilla, self.jugador.forma.center)
+        self.seguir_camino()
+        return True
+
+    def patrullar(self):
+        # Patrullar en un área definida
+        if not self.camino:
+            self.punto_actual = (self.punto_actual + 1) % len(self.puntos_patrullaje)
+            objetivo = self.puntos_patrullaje[self.punto_actual]
+            self.buscar_camino(self.grilla, objetivo)
+        self.seguir_camino()
+        return True
+
+    def actualizar_comportamiento(self):
+        # Ejecutar el árbol de comportamiento
+        self.behavior_tree.run()

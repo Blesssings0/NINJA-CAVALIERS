@@ -1,7 +1,7 @@
 import pygame
 
 WIDTH = 800
-HEIGHT = 750
+HEIGHT = 780
 
 Ancho_PERSONAJE = 50
 Alto_personaje = 50
@@ -13,9 +13,9 @@ Velocidad_Personaje = 5
 Posicion_initial = (0, 0)
 Scala_personaje = 0.6
 
-Escalar_enemigos = 0.7
-Alto_ENEMIGO = 40
-Ancho_ENEMIGO = 40
+Escalar_enemigos = 0.6
+Alto_ENEMIGO = 50
+Ancho_ENEMIGO = 50
 
 # Colores para las líneas
 COLOR_LINEA = (255, 255, 255)  # Color blanco para las líneas de los tiles
@@ -26,4 +26,4 @@ FILAS = 1
 COLUMNAS = 1
 
 # Añadir constante para la velocidad del enemigo
-Velocidad_Enemigo = 0.5  # Ajusta este valor según sea necesario
+Velocidad_Enemigo = 5 # Ajusta este valor según sea necesario
