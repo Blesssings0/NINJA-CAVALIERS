@@ -18,6 +18,8 @@ class Enemigo:
         self.velocidad = constantes.Velocidad_Enemigo
         self.jugador = None  # Referencia al jugador
         self.grilla = None  # Referencia a la grilla del mapa
+        self.distancia_perseguida = 0  # Distancia que el enemigo ha perseguido al jugador
+        self.distancia_max_persecucion = 500  # Distancia máxima de persecución aumentada
 
         # Definir el árbol de comportamiento
         self.behavior_tree = Selector([
@@ -105,13 +107,18 @@ class Enemigo:
     def detectar_jugador(self):
         # Detectar si el jugador está cerca
         distancia = ((self.forma.centerx - self.jugador.forma.centerx) ** 2 + (self.forma.centery - self.jugador.forma.centery) ** 2) ** 0.5
-        return distancia < 70  # Distancia de detección
+        return distancia < 110  # Distancia de detección ajustada a 110
 
     def perseguir_jugador(self):
         # Perseguir al jugador
-        self.buscar_camino(self.grilla, self.jugador.forma.center)
-        self.seguir_camino()
-        return True
+        if self.distancia_perseguida < self.distancia_max_persecucion:
+            self.buscar_camino(self.grilla, self.jugador.forma.center)
+            self.seguir_camino()
+            self.distancia_perseguida += self.velocidad
+            return True
+        else:
+            self.distancia_perseguida = 0  # Resetear la distancia perseguida
+            return False
 
     def patrullar(self):
         # Patrullar en un área definida

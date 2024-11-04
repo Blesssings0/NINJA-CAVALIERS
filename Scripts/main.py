@@ -18,7 +18,7 @@ animaciones, animaciones_ataque, animaciones_enemigo, animaciones_enemigo2, anim
 # Inicializar otros elementos del juego
 world = Mundo(constantes.WIDTH, constantes.HEIGHT, "Assets/MUNDO/battleground2.png")
 Jugador = Personaje(30, 30, animaciones, animaciones_ataque)  # Inicializar el jugador
-cavalier = Enemigo(150, 125, animaciones_enemigo)  # Inicializar el cavalier
+cavalier = Enemigo(170, 125, animaciones_enemigo)  # Inicializar el cavalier
 Lanzador = Enemigo(300, 455, animaciones_enemigo2)  # Inicializar el lanzador
 Soldier = Enemigo(250, 300, animaciones_enemigo3)  # Inicializar el soldier
 
