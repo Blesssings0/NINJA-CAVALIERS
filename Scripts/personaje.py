@@ -1,6 +1,7 @@
 # personaje.py
 import pygame
 import constantes
+from letras_flotantes import LetrasFlotantes  # Importar la clase LetrasFlotantes
 
 class Personaje:
     def __init__(self, x, y, animaciones, animaciones_ataque):
@@ -17,6 +18,7 @@ class Personaje:
     def dibujar(self, interfaz):
         imagen_flip = pygame.transform.flip(self.image, self.flip, False)
         interfaz.blit(imagen_flip, self.forma)
+        pygame.draw.rect(interfaz, (0, 255, 0), self.forma, 2)  # Verde con grosor de 2 píxeles
 
     def Update_Frame(self):
         cooldown_animaciones = 100
@@ -25,7 +27,7 @@ class Personaje:
             self.update_time = pygame.time.get_ticks()  
 
         if self.atacando:
-            if self.frame_index >= len(self.animaciones_ataque):
+            if self.frame_index >= len(self.animaciones_ataque):    
                 self.frame_index = 0
                 self.atacando = False
             self.image = self.animaciones_ataque[self.frame_index]
@@ -59,8 +61,10 @@ class Personaje:
                         return True
         return False
 
-    def atacar(self, enemigos):
+    def atacar(self, enemigos, letras_flotantes):
         self.atacando = True
         for enemigo in enemigos:
             if self.forma.colliderect(enemigo.forma):
-                enemigo.recibir_dano(1)
+                dano = 10  # Cantidad de daño infligido
+                enemigo.recibir_dano(dano)
+                letras_flotantes.append(LetrasFlotantes(enemigo.forma.centerx, enemigo.forma.centery, str(dano), (255, 0, 0)))

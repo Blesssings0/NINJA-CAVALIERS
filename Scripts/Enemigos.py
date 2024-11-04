@@ -2,53 +2,52 @@
 import pygame
 import constantes
 from astar import astar
-from search_algorithms import bfs, dfs, bidirectional_search
 
 class Enemigo:
-    def __init__(self, x, y, animaciones, algoritmo='astar'):
-        # Inicializa el enemigo con su posición, animaciones y velocidad
-        self.flip = False  # Indica si el sprite debe ser volteado horizontalmente
-        self.animaciones = animaciones  # Lista de animaciones del enemigo
-        self.frame_index = 0  # Índice del frame actual de la animación
-        self.update_time = pygame.time.get_ticks()  # Tiempo de la última actualización del frame
-        self.image = animaciones[self.frame_index]  # Imagen actual del enemigo
-        self.forma = pygame.Rect(0, 0, constantes.Ancho_ENEMIGO, constantes.Alto_ENEMIGO)  # Rectángulo que representa la forma del enemigo
-        self.forma.center = (x, y)  # Posición inicial del enemigo
-        self.salud = 100  # Salud del enemigo
-        self.camino = []  # Lista de posiciones que forman el camino a seguir
-        self.velocidad = constantes.Velocidad_Enemigo  # Utilizar la constante Velocidad_Enemigo
-        self.algoritmo = algoritmo  # Algoritmo de búsqueda a utilizar
+    def __init__(self, x, y, animaciones):
+        self.flip = False
+        self.animaciones = animaciones
+        self.frame_index = 0
+        self.update_time = pygame.time.get_ticks()
+        self.image = animaciones[self.frame_index]
+        self.forma = pygame.Rect(0, 0, constantes.Ancho_ENEMIGO, constantes.Alto_ENEMIGO)
+        self.forma.center = (x, y)
+        self.salud = 100
+        self.camino = []
+        self.velocidad = constantes.Velocidad_Enemigo
 
     def dibujar(self, interfaz):
-        # Dibuja el enemigo en la interfaz
-        imagen_flip = pygame.transform.flip(self.image, self.flip, False)  # Voltea la imagen si es necesario
-        interfaz.blit(imagen_flip, self.forma)  # Dibuja la imagen en la posición del rectángulo
+        if self.forma:  # Solo dibujar si el enemigo no ha sido eliminado
+            imagen_flip = pygame.transform.flip(self.image, self.flip, False)
+            interfaz.blit(imagen_flip, self.forma)
+            pygame.draw.rect(interfaz, (0, 255, 0), self.forma, 2)  # Verde con grosor de 2 píxeles
 
     def Update_Frame(self):
-        # Actualiza el frame de la animación del enemigo
-        cooldown_animaciones = 100  # Tiempo entre frames de la animación
-        self.image = self.animaciones[self.frame_index]  # Actualiza la imagen actual
+        if self.forma:  # Solo actualizar si el enemigo no ha sido eliminado
+            cooldown_animaciones = 100
+            self.image = self.animaciones[self.frame_index]
 
-        if pygame.time.get_ticks() - self.update_time >= cooldown_animaciones:
-            self.frame_index += 1  # Avanza al siguiente frame
-            self.update_time = pygame.time.get_ticks()  # Actualiza el tiempo de la última actualización
+            if pygame.time.get_ticks() - self.update_time >= cooldown_animaciones:
+                self.frame_index += 1
+                self.update_time = pygame.time.get_ticks()
 
-        if self.frame_index >= len(self.animaciones):
-            self.frame_index = 0  # Reinicia el índice de frames si llega al final
+            if self.frame_index >= len(self.animaciones):
+                self.frame_index = 0
 
     def movimiento(self, velocidad_x, velocidad_y, grilla):
-        # Mueve al enemigo en la dirección indicada, verificando colisiones
-        if not self.verificar_colision(grilla, velocidad_x, 0):
-            self.forma.x += velocidad_x
-            if velocidad_x < 0:
-                self.flip = True  # Voltea la imagen si se mueve a la izquierda
-            elif velocidad_x > 0:
-                self.flip = False  # No voltea la imagen si se mueve a la derecha
-        if not self.verificar_colision(grilla, 0, velocidad_y):
-            self.forma.y += velocidad_y
+        if self.forma:  # Solo mover si el enemigo no ha sido eliminado
+            if not self.verificar_colision(grilla, velocidad_x, 0):
+                self.forma.x += velocidad_x
+                if velocidad_x < 0:
+                    self.flip = True
+                elif velocidad_x > 0:
+                    self.flip = False
+            if not self.verificar_colision(grilla, 0, velocidad_y):
+                self.forma.y += velocidad_y
 
     def verificar_colision(self, grilla, dx, dy):
-        # Verifica si el enemigo colisiona con algún obstáculo en la grilla
+        if not self.forma:  # Si el enemigo ha sido eliminado, no hay colisión
+            return False
         tile_size = constantes.Tile_Size
         enemigo_rect = self.forma.copy()
         enemigo_rect.x += dx
@@ -63,39 +62,29 @@ class Enemigo:
         return False
 
     def recibir_dano(self, cantidad):
-        # Reduce la salud del enemigo al recibir daño
         self.salud -= cantidad
         if self.salud <= 0:
             self.salud = 0
             print("¡Enemigo derrotado!")
 
     def buscar_camino(self, grilla, objetivo):
-        # Calcula el camino hacia el objetivo usando el algoritmo seleccionado
-        inicio = (self.forma.centerx // constantes.Tile_Size, self.forma.centery // constantes.Tile_Size)
-        objetivo = (objetivo[0] // constantes.Tile_Size, objetivo[1] // constantes.Tile_Size)
-        if self.algoritmo == 'astar':
+        if self.forma:  # Solo buscar camino si el enemigo no ha sido eliminado
+            inicio = (self.forma.centerx // constantes.Tile_Size, self.forma.centery // constantes.Tile_Size)
+            objetivo = (objetivo[0] // constantes.Tile_Size, objetivo[1] // constantes.Tile_Size)
             self.camino = astar(grilla, inicio, objetivo)
-        elif self.algoritmo == 'bfs':
-            self.camino = bfs(grilla, inicio, objetivo)
-        elif self.algoritmo == 'dfs':
-            self.camino = dfs(grilla, inicio, objetivo)
-        elif self.algoritmo == 'bidirectional':
-            self.camino = bidirectional_search(grilla, inicio, objetivo)
 
     def seguir_camino(self):
-        # Sigue el camino calculado hacia el objetivo
-        if self.camino:
+        if self.forma and self.camino:  # Solo seguir camino si el enemigo no ha sido eliminado
             siguiente = self.camino.pop(0)
             self.forma.center = (siguiente[0] * constantes.Tile_Size + constantes.Tile_Size // 2,
                                  siguiente[1] * constantes.Tile_Size + constantes.Tile_Size // 2)
 
     def perseguir_jugador(self, grilla, jugador):
-        # Persigue al jugador si está dentro de la distancia de detección
-        distancia = ((self.forma.centerx - jugador.forma.centerx) ** 2 + (self.forma.centery - jugador.forma.centery) ** 2) ** 0.5
-        if distancia < 200:  # Distancia de detección
-            self.buscar_camino(grilla, jugador.forma.center)
-            # Ajustar la dirección de mirada en función de la posición del jugador
-            if self.forma.centerx < jugador.forma.centerx:
-                self.flip = False
-            else:
-                self.flip = True
+        if self.forma:  # Solo perseguir si el enemigo no ha sido eliminado
+            distancia = ((self.forma.centerx - jugador.forma.centerx) ** 2 + (self.forma.centery - jugador.forma.centery) ** 2) ** 0.5
+            if distancia < 200:  # Distancia de detección
+                self.buscar_camino(grilla, jugador.forma.center)
+                if self.forma.centerx < jugador.forma.centerx:
+                    self.flip = False
+                else:
+                    self.flip = True

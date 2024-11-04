@@ -5,7 +5,7 @@ from utils import scalar_imagen
 from personaje import Personaje
 from Enemigos import Enemigo
 from Mapa import Mundo
-from Coliciones import manejar_colisiones
+from Coliciones import manejar_colisiones, dibujar_colisiones
 
 def dibujar_elementos(screen, background_image, world, Jugador, cavalier, Lanzador, Soldier):
     screen.blit(background_image, (0, 0))  # Draw the background image
@@ -14,7 +14,7 @@ def dibujar_elementos(screen, background_image, world, Jugador, cavalier, Lanzad
     cavalier.dibujar(screen)
     Lanzador.dibujar(screen)
     Soldier.dibujar(screen)
-    # dibujar_colisiones(screen, world.grilla)  # Dibujar colisiones
+    dibujar_colisiones(screen, world.grilla)  # Dibujar colisiones
     # dibujar_grid()
 
 def manejar_eventos(Mover_arriba, Mover_abajo, Mover_izquierda, Mover_derecha, Jugador, enemigos):

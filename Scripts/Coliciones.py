@@ -43,6 +43,11 @@ def manejar_colisiones_obstaculos(Jugador, grilla, posicion_x, posicion_y):
                         Jugador.forma.bottom = obstaculo_rect.top
                     elif posicion_y < 0:  # Se mueve hacia arriba
                         Jugador.forma.top = obstaculo_rect.bottom
-                    # Detener el movimiento en la dirección de la colisión
-                    posicion_x = 0
-                    posicion_y = 0
+
+def dibujar_colisiones(surface, grilla):
+    tile_size = constantes.Tile_Size
+    for y, row in enumerate(grilla):
+        for x, tile in enumerate(row):
+            if tile == 1:
+                obstaculo_rect = pygame.Rect(x * tile_size, y * tile_size, tile_size, tile_size)
+                pygame.draw.rect(surface, (255, 0, 0), obstaculo_rect, 2)  # Rojo con grosor de 2 píxeles
