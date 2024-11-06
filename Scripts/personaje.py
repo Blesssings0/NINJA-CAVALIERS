@@ -41,6 +41,14 @@ class Personaje:
         barra_x = self.forma.x
         barra_y = self.forma.y - 10
 
+        # Ensure the health bar doesn't go beyond the screen boundaries
+        if barra_x < 0:
+            barra_x = 0
+        if barra_x + barra_ancho > constantes.WIDTH:
+            barra_x = constantes.WIDTH - barra_ancho
+        if barra_y < 0:
+            barra_y = 0
+
         # Calculate health percentage
         porcentaje_vida = self.salud / self.max_salud
 

@@ -51,7 +51,7 @@ def mostrar_pantalla_game_over(screen):
 
 def mostrar_pantalla_game_win(screen):
     screen.fill((0, 0, 0))  # Set background to black
-    font = pygame.font.Font(None, 74)
+    font = pygame.font.Font(None, 64)
     texto_game_win = font.render("Game Win", True, (0, 255, 0))
     rect_texto_game_win = texto_game_win.get_rect(center=(constantes.WIDTH // 2, constantes.HEIGHT // 2 - 50))
     
@@ -87,6 +87,15 @@ def reiniciar_juego():
     enemigos = [cavalier, Lanzador, Soldier]
     fuentes_vida = [FuenteVida(100, 100), FuenteVida(300, 300), FuenteVida(500, 500)]  # Reiniciar fuentes de vida
     tiempo_inicio = pygame.time.get_ticks()  # Reiniciar el tiempo de inicio
+
+def mostrar_tiempo_restante(screen, tiempo_inicio, tiempo_limite):
+    tiempo_actual = pygame.time.get_ticks()
+    tiempo_transcurrido = (tiempo_actual - tiempo_inicio) / 1000  # Convertir a segundos
+    tiempo_restante = max(0, tiempo_limite - tiempo_transcurrido)
+
+    font = pygame.font.Font(None, 36)
+    texto_tiempo = font.render(f"Tiempo restante: {int(tiempo_restante)}s", True, (255, 255, 255))
+    screen.blit(texto_tiempo, (10, 10))
 
 def run_game():
     global screen, background_image, reloj, Jugador, cavalier, Lanzador, Soldier, enemigos, world, fuentes_vida, tiempo_inicio
@@ -197,6 +206,9 @@ def run_game():
 
             # Dibujar elementos
             dibujar_elementos(screen, background_image, world, Jugador, cavalier, Lanzador, Soldier, fuentes_vida)
+
+            # Mostrar tiempo restante
+            mostrar_tiempo_restante(screen, tiempo_inicio, TIEMPO_LIMITE)
 
             # Actualizar frames de animación
             Jugador.Update_Frame()

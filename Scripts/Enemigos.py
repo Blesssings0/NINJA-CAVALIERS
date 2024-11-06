@@ -19,7 +19,7 @@ class Enemigo:
         self.forma.center = (x, y)
         self.salud = 100
         self.max_salud = 100
-        self.attack_damage = 2
+        self.attack_damage = 5
         self.attack_cooldown = 500
         self.last_attack_time = 0
         self.attack_range = 5
@@ -29,7 +29,7 @@ class Enemigo:
         self.jugador = None  # Referencia al jugador
         self.grilla = None  # Referencia a la grilla del mapa
         self.distancia_perseguida = 0  # Distancia que el enemigo ha perseguido al jugador
-        self.distancia_max_persecucion = 1000  # Distancia máxima de persecución aumentada
+        self.distancia_max_persecucion = 600  # Distancia máxima de persecución aumentada
         self.atacando = False
         self.derrotado = False  # Flag to indicate if the enemy is defeated
         self.textos_dano = []  # List to store damage texts
