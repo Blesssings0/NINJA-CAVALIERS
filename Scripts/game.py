@@ -7,13 +7,24 @@ from Enemigos import Enemigo
 from Mapa import Mundo
 from Coliciones import manejar_colisiones, dibujar_colisiones
 
-def dibujar_elementos(screen, background_image, world, Jugador, cavalier, Lanzador, Soldier):
+class FuenteVida:
+    def __init__(self, x, y):
+        self.forma = pygame.Rect(x, y, 20, 20)  # Tamaño de la fuente de vida
+        self.image = pygame.Surface((20, 20))
+        self.image.fill((0, 255, 0))  # Color verde para la fuente de vida
+
+    def dibujar(self, screen):
+        screen.blit(self.image, self.forma)
+
+def dibujar_elementos(screen, background_image, world, Jugador, cavalier, lanzador, soldier, fuentes_vida):
     screen.blit(background_image, (0, 0))  # Draw the background image
     world.draw(screen)
     Jugador.dibujar(screen)
     cavalier.dibujar(screen)
-    Lanzador.dibujar(screen)
-    Soldier.dibujar(screen)
+    lanzador.dibujar(screen)
+    soldier.dibujar(screen)
+    for fuente in fuentes_vida:
+        fuente.dibujar(screen)
     dibujar_colisiones(screen, world.grilla)  # Dibujar colisiones
     # dibujar_grid()
 
@@ -47,5 +58,10 @@ def manejar_eventos(Mover_arriba, Mover_abajo, Mover_izquierda, Mover_derecha, J
             if event.key == pygame.K_a:
                 atacando = False
 
-
     return True, Mover_arriba, Mover_abajo, Mover_izquierda, Mover_derecha, atacando
+
+def manejar_colisiones_fuentes(Jugador, fuentes_vida):
+    for fuente in fuentes_vida[:]:
+        if Jugador.forma.colliderect(fuente.forma):
+            Jugador.salud = min(Jugador.max_salud, Jugador.salud + 10)
+            fuentes_vida.remove(fuente)

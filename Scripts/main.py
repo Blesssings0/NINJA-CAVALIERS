@@ -1,92 +1,193 @@
 # main.py
 import pygame
 from inicializar import inicializar_juego
-from game import manejar_colisiones, dibujar_elementos, manejar_eventos
+from game import manejar_colisiones, dibujar_elementos, manejar_eventos, FuenteVida, manejar_colisiones_fuentes
 from personaje import Personaje
 from Enemigos import Enemigo
 from Mapa import Mundo
 import constantes
 from Cargar_imagenes import cargar_animaciones
-from letras_flotantes import LetrasFlotantes
 
-# Inicializar el juego
-screen, background_image, reloj = inicializar_juego()
+# Tiempo límite en segundos (ajustable)
+TIEMPO_LIMITE = 60
 
-# Cargar animaciones
-animaciones, animaciones_ataque, animaciones_enemigo, animaciones_enemigo2, animaciones_enemigo3 = cargar_animaciones()
-
-# Inicializar otros elementos del juego
-world = Mundo(constantes.WIDTH, constantes.HEIGHT, "Assets/MUNDO/battleground2.png")
-Jugador = Personaje(30, 30, animaciones, animaciones_ataque)  # Inicializar el jugador
-cavalier = Enemigo(170, 125, animaciones_enemigo)  # Inicializar el cavalier
-Lanzador = Enemigo(300, 455, animaciones_enemigo2)  # Inicializar el lanzador
-Soldier = Enemigo(250, 300, animaciones_enemigo3)  # Inicializar el soldier
-
-# Asignar referencias al jugador y la grilla en los enemigos
-for enemigo in [cavalier, Lanzador, Soldier]:
-    enemigo.jugador = Jugador
-    enemigo.grilla = world.grilla
-
-# Inicializar posiciones
-posicion_x = 0  # Inicializar la posición x
-posicion_y = 0  # Inicializar la posición y
-
-# Inicializar variables de movimiento
-Mover_arriba = Mover_abajo = Mover_izquierda = Mover_derecha = False
-
-# Inicializar letras flotantes
-letras_flotantes = []
-
-# Lista de enemigos
-enemigos = [cavalier, Lanzador, Soldier]
-
-running = True
-while running:
-    # Manejar eventos
-    running, Mover_arriba, Mover_abajo, Mover_izquierda, Mover_derecha, atacando = manejar_eventos(Mover_arriba, Mover_abajo, Mover_izquierda, Mover_derecha, Jugador, enemigos)
+def mostrar_pantalla_inicio(screen, background_image):
+    screen.blit(background_image, (0, 0))  # Set background image
+    font = pygame.font.Font(None, 74)
+    boton_inicio = pygame.Rect(constantes.WIDTH // 2 - 100, constantes.HEIGHT // 2 - 50, 200, 50)
+    texto_inicio = font.render("Iniciar", True, (255, 255, 255))
+    rect_texto_inicio = texto_inicio.get_rect(center=boton_inicio.center)
     
-    # Actualizar posición del jugador
-    posicion_x = 0
-    posicion_y = 0
-    if Mover_arriba:
-        posicion_y -= constantes.Velocidad_Personaje
-    if Mover_abajo:
-        posicion_y += constantes.Velocidad_Personaje
-    if Mover_izquierda:
-        posicion_x -= constantes.Velocidad_Personaje
-    if Mover_derecha:
-        posicion_x += constantes.Velocidad_Personaje
-
-    # Lógica del juego
-    manejar_colisiones(Jugador, cavalier, Lanzador, Soldier, world, posicion_x, posicion_y)
+    boton_pausar_musica = pygame.Rect(constantes.WIDTH // 2 - 100, constantes.HEIGHT // 2 + 10, 200, 50)
+    texto_pausar_musica = font.render("Pausar Musica", True, (255, 255, 255))
+    rect_texto_pausar_musica = texto_pausar_musica.get_rect(center=boton_pausar_musica.center)
     
-    # Dibujar elementos
-    dibujar_elementos(screen, background_image, world, Jugador, cavalier, Lanzador, Soldier)
-
-    # Actualizar frames de animación
-    Jugador.Update_Frame()
-    for enemigo in enemigos:
-        enemigo.Update_Frame()
-
-    # Control del jugador en los ejes X e Y
-    Jugador.movimiento(posicion_x, posicion_y, world.grilla)
-
-    # Manejar ataque
-    if atacando:
-        Jugador.atacar(enemigos, letras_flotantes)
-
-    # Actualizar y dibujar letras flotantes
-    for letra in letras_flotantes[:]:
-        letra.actualizar()
-        letra.dibujar(screen)
-        if letra.ha_terminado():
-            letras_flotantes.remove(letra)
-
-    # Enemigos buscan camino hacia el jugador
-    for enemigo in enemigos:
-        enemigo.actualizar_comportamiento()
-
+    pygame.draw.rect(screen, (0, 0, 0), boton_inicio)
+    screen.blit(texto_inicio, rect_texto_inicio)
+    pygame.draw.rect(screen, (0, 0, 0), boton_pausar_musica)
+    screen.blit(texto_pausar_musica, rect_texto_pausar_musica)
+    
     pygame.display.flip()
-    reloj.tick(60)
+    
+    return boton_inicio, boton_pausar_musica
 
-pygame.quit()
+def mostrar_pantalla_game_over(screen):
+    screen.fill((0, 0, 0))  # Set background to black
+    font = pygame.font.Font(None, 74)
+    texto_game_over = font.render("Game Over", True, (255, 0, 0))
+    rect_texto_game_over = texto_game_over.get_rect(center=(constantes.WIDTH // 2, constantes.HEIGHT // 2 - 50))
+    
+    boton_reinicio = pygame.Rect(constantes.WIDTH // 2 - 100, constantes.HEIGHT // 2 + 50, 200, 50)
+    texto_reinicio = font.render("Reiniciar", True, (255, 255, 255))
+    rect_texto_reinicio = texto_reinicio.get_rect(center=boton_reinicio.center)
+    
+    screen.blit(texto_game_over, rect_texto_game_over)
+    pygame.draw.rect(screen, (0, 0, 0), boton_reinicio)
+    screen.blit(texto_reinicio, rect_texto_reinicio)
+    
+    pygame.display.flip()
+    
+    return boton_reinicio
+
+def cambiar_imagen_fondo(ruta_imagen):
+    global background_image
+    background_image = pygame.image.load(ruta_imagen)
+
+def reiniciar_juego():
+    global screen, background_image, reloj, Jugador, cavalier, Lanzador, Soldier, enemigos, world, fuentes_vida, tiempo_inicio
+    screen, background_image, reloj = inicializar_juego()
+    (animaciones, animaciones_ataque, animaciones_enemigo, animaciones_ataque_enemigo, 
+     animaciones_enemigo2, animaciones_ataque_enemigo2, animaciones_enemigo3, animaciones_ataque_enemigo3) = cargar_animaciones()
+    world = Mundo(constantes.WIDTH, constantes.HEIGHT, "Assets/MUNDO/battleground2.png")
+    Jugador = Personaje(30, 30, animaciones, animaciones_ataque)
+    cavalier = Enemigo(170, 125, animaciones_enemigo, animaciones_ataque_enemigo)
+    Lanzador = Enemigo(200, 455, animaciones_enemigo2, animaciones_ataque_enemigo2)
+    Soldier = Enemigo(480, 600, animaciones_enemigo3, animaciones_ataque_enemigo3)
+    for enemigo in [cavalier, Lanzador, Soldier]:
+        enemigo.jugador = Jugador
+        enemigo.grilla = world.grilla
+    enemigos = [cavalier, Lanzador, Soldier]
+    fuentes_vida = [FuenteVida(100, 100), FuenteVida(300, 300), FuenteVida(500, 500)]  # Reiniciar fuentes de vida
+    tiempo_inicio = pygame.time.get_ticks()  # Reiniciar el tiempo de inicio
+
+def run_game():
+    global screen, background_image, reloj, Jugador, cavalier, Lanzador, Soldier, enemigos, world, fuentes_vida, tiempo_inicio
+
+    # Inicializar el juego
+    screen, background_image, reloj = inicializar_juego()
+
+    # Cargar música de fondo
+    pygame.mixer.music.load("Assets/Sounds/background_music.mp3")
+    pygame.mixer.music.play(-1)  # Reproducir en bucle
+
+    # Cargar animaciones
+    (animaciones, animaciones_ataque, animaciones_enemigo, animaciones_ataque_enemigo, 
+    animaciones_enemigo2, animaciones_ataque_enemigo2, animaciones_enemigo3, animaciones_ataque_enemigo3) = cargar_animaciones()
+
+    # Inicializar otros elementos del juego
+    world = Mundo(constantes.WIDTH, constantes.HEIGHT, "Assets/MUNDO/battleground2.png")
+    Jugador = Personaje(30, 30, animaciones, animaciones_ataque)  # Inicializar el jugador
+    cavalier = Enemigo(170, 125, animaciones_enemigo, animaciones_ataque_enemigo)  # Inicializar el cavalier
+    Lanzador = Enemigo(200, 455, animaciones_enemigo2, animaciones_ataque_enemigo2)  # Inicializar el lanzador
+    Soldier = Enemigo(480, 600, animaciones_enemigo3, animaciones_ataque_enemigo3)  # Inicializar el soldier6
+
+    # Asignar referencias al jugador y la grilla en los enemigos
+    for enemigo in [cavalier, Lanzador, Soldier]:
+        enemigo.jugador = Jugador
+        enemigo.grilla = world.grilla
+
+    # Inicializar posiciones
+    posicion_x = 0  # Inicializar la posición x
+    posicion_y = 0  # Inicializar la posición y
+
+    # Inicializar variables de movimiento
+    Mover_arriba = Mover_abajo = Mover_izquierda = Mover_derecha = False
+
+    # Lista de enemigos
+    enemigos = [cavalier, Lanzador, Soldier]
+
+    # Lista de fuentes de vida
+    fuentes_vida = [FuenteVida(100, 100), FuenteVida(300, 300), FuenteVida(670, 450)]
+
+    # Inicializar tiempo de inicio
+    tiempo_inicio = pygame.time.get_ticks()
+
+    running = True
+    game_over = False
+    game_started = False
+    while running:
+        if not game_started:
+            boton_inicio, boton_pausar_musica = mostrar_pantalla_inicio(screen, background_image)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if boton_inicio.collidepoint(event.pos):
+                        game_started = True
+                        tiempo_inicio = pygame.time.get_ticks()  # Reiniciar el tiempo de inicio al comenzar el juego
+                    elif boton_pausar_musica.collidepoint(event.pos):
+                        if pygame.mixer.music.get_busy():
+                            pygame.mixer.music.pause()
+                        else:
+                            pygame.mixer.music.unpause()
+        elif game_over:
+            boton_reinicio = mostrar_pantalla_game_over(screen)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if boton_reinicio.collidepoint(event.pos):
+                        reiniciar_juego()
+                        game_over = False
+                        game_started = True
+        else:
+            # Manejar eventos
+            running, Mover_arriba, Mover_abajo, Mover_izquierda, Mover_derecha, atacando = manejar_eventos(Mover_arriba, Mover_abajo, Mover_izquierda, Mover_derecha, Jugador, enemigos)
+            
+            # Actualizar posición del jugador
+            posicion_x = 0
+            posicion_y = 0
+            if Mover_arriba:
+                posicion_y -= constantes.Velocidad_Personaje
+            if Mover_abajo:
+                posicion_y += constantes.Velocidad_Personaje
+            if Mover_izquierda:
+                posicion_x -= constantes.Velocidad_Personaje
+            if Mover_derecha:
+                posicion_x += constantes.Velocidad_Personaje
+
+            # Control del jugador en los ejes X e Y
+            Jugador.movimiento(posicion_x, posicion_y, world.grilla)
+
+            # Lógica del juego
+            manejar_colisiones(Jugador, enemigos, world, posicion_x, posicion_y)
+            manejar_colisiones_fuentes(Jugador, fuentes_vida)
+            
+            if atacando:
+                Jugador.atacar(enemigos)
+
+            # Dibujar elementos
+            dibujar_elementos(screen, background_image, world, Jugador, cavalier, Lanzador, Soldier, fuentes_vida)
+
+            # Actualizar frames de animación
+            Jugador.Update_Frame()
+            for enemigo in enemigos:
+                enemigo.Update_Frame()
+
+            # Enemigos buscan camino hacia el jugador y atacan
+            for enemigo in enemigos:
+                enemigo.actualizar_comportamiento()
+
+            # Verificar si el tiempo límite se ha agotado
+            tiempo_actual = pygame.time.get_ticks()
+            tiempo_transcurrido = (tiempo_actual - tiempo_inicio) / 1000  # Convertir a segundos
+            if tiempo_transcurrido >= TIEMPO_LIMITE:
+                game_over = True
+
+            if Jugador.derrotado:
+                game_over = True
+
+            pygame.display.flip()
+            reloj.tick(60)
+
+    pygame.quit()

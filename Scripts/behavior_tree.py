@@ -1,3 +1,5 @@
+import pygame
+
 # behavior_tree.py
 
 class Node:
@@ -30,3 +32,18 @@ class Action(Node):
 
     def run(self):
         return self.func()
+
+class Timer(Node):
+    def __init__(self, duration, child):
+        self.duration = duration
+        self.child = child
+        self.start_time = None
+
+    def run(self):
+        if self.start_time is None:
+            self.start_time = pygame.time.get_ticks()
+        current_time = pygame.time.get_ticks()
+        if current_time - self.start_time >= self.duration:
+            self.start_time = None
+            return self.child.run()
+        return False

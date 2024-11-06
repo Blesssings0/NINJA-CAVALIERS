@@ -2,15 +2,15 @@
 import pygame
 import constantes
 
-def manejar_colisiones(Jugador, cavalier, Lanzador, Soldier, world, posicion_x, posicion_y):
-    separar_objetos(Jugador, cavalier)
-    separar_objetos(Jugador, Lanzador)
-    separar_objetos(Jugador, Soldier)
+def manejar_colisiones(Jugador, enemigos, world, posicion_x, posicion_y):
+    for enemigo in enemigos:
+        separar_objetos(Jugador, enemigo)
+        manejar_colision_ataque(Jugador, enemigo)
     manejar_colisiones_obstaculos(Jugador, world.grilla, posicion_x, posicion_y)
 
 def separar_objetos(Jugador, objeto):
     # Empuja al jugador fuera del objeto en caso de colisión
-    if Jugador.forma.colliderect(objeto.forma):
+    if not objeto.derrotado and Jugador.forma.colliderect(objeto.forma):
         dx = (Jugador.forma.centerx - objeto.forma.centerx)
         dy = (Jugador.forma.centery - objeto.forma.centery)
         if abs(dx) > abs(dy):
@@ -23,6 +23,11 @@ def separar_objetos(Jugador, objeto):
                 Jugador.forma.top = objeto.forma.bottom
             else:
                 Jugador.forma.bottom = objeto.forma.top
+
+def manejar_colision_ataque(Jugador, enemigo):
+    # Manejar colisión de ataque del enemigo
+    if not enemigo.derrotado and enemigo.atacando and enemigo.forma.colliderect(Jugador.forma):
+        Jugador.recibir_dano(10)  # Infligir daño al jugador
 
 def manejar_colisiones_obstaculos(Jugador, grilla, posicion_x, posicion_y):
     tile_size = constantes.Tile_Size
