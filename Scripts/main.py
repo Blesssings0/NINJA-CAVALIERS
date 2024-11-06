@@ -49,6 +49,24 @@ def mostrar_pantalla_game_over(screen):
     
     return boton_reinicio
 
+def mostrar_pantalla_game_win(screen):
+    screen.fill((0, 0, 0))  # Set background to black
+    font = pygame.font.Font(None, 74)
+    texto_game_win = font.render("Game Win", True, (0, 255, 0))
+    rect_texto_game_win = texto_game_win.get_rect(center=(constantes.WIDTH // 2, constantes.HEIGHT // 2 - 50))
+    
+    boton_reinicio = pygame.Rect(constantes.WIDTH // 2 - 100, constantes.HEIGHT // 2 + 50, 200, 50)
+    texto_reinicio = font.render("Reiniciar", True, (255, 255, 255))
+    rect_texto_reinicio = texto_reinicio.get_rect(center=boton_reinicio.center)
+    
+    screen.blit(texto_game_win, rect_texto_game_win)
+    pygame.draw.rect(screen, (0, 0, 0), boton_reinicio)
+    screen.blit(texto_reinicio, rect_texto_reinicio)
+    
+    pygame.display.flip()
+    
+    return boton_reinicio
+
 def cambiar_imagen_fondo(ruta_imagen):
     global background_image
     background_image = pygame.image.load(ruta_imagen)
@@ -114,6 +132,7 @@ def run_game():
 
     running = True
     game_over = False
+    game_win = False
     game_started = False
     while running:
         if not game_started:
@@ -139,6 +158,16 @@ def run_game():
                     if boton_reinicio.collidepoint(event.pos):
                         reiniciar_juego()
                         game_over = False
+                        game_started = True
+        elif game_win:
+            boton_reinicio = mostrar_pantalla_game_win(screen)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if boton_reinicio.collidepoint(event.pos):
+                        reiniciar_juego()
+                        game_win = False
                         game_started = True
         else:
             # Manejar eventos
@@ -186,6 +215,10 @@ def run_game():
 
             if Jugador.derrotado:
                 game_over = True
+
+            # Check if all enemies are defeated
+            if all(enemigo.derrotado for enemigo in enemigos):
+                game_win = True
 
             pygame.display.flip()
             reloj.tick(60)

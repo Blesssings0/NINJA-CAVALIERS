@@ -32,6 +32,23 @@ class Personaje:
             imagen_flip = pygame.transform.flip(self.image, self.flip, False)
             interfaz.blit(imagen_flip, self.forma)
             pygame.draw.rect(interfaz, (0, 255, 0), self.forma, 2)  # Dibujar el rectángulo de colisión del jugador en verde
+            self.dibujar_barra_vida(interfaz)  # Draw health bar
+
+    def dibujar_barra_vida(self, interfaz):
+        # Calculate health bar dimensions
+        barra_ancho = self.forma.width
+        barra_alto = 5
+        barra_x = self.forma.x
+        barra_y = self.forma.y - 10
+
+        # Calculate health percentage
+        porcentaje_vida = self.salud / self.max_salud
+
+        # Draw health bar background
+        pygame.draw.rect(interfaz, (255, 0, 0), (barra_x, barra_y, barra_ancho, barra_alto))
+
+        # Draw health bar foreground
+        pygame.draw.rect(interfaz, (0, 255, 0), (barra_x, barra_y, barra_ancho * porcentaje_vida, barra_alto))
 
     def Update_Frame(self):
         if not self.derrotado:  # Only update if the player is not defeated

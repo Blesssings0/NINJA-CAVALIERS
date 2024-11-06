@@ -18,11 +18,11 @@ class Enemigo:
         self.forma = pygame.Rect(0, 0, constantes.Ancho_ENEMIGO, constantes.Alto_ENEMIGO)
         self.forma.center = (x, y)
         self.salud = 100
-        self.max_salud = 10
-        self.attack_damage = 5
-        self.attack_cooldown = 200
+        self.max_salud = 100
+        self.attack_damage = 2
+        self.attack_cooldown = 500
         self.last_attack_time = 0
-        self.attack_range = 10
+        self.attack_range = 5
 
         self.camino = []
         self.velocidad = constantes.Velocidad_Enemigo
