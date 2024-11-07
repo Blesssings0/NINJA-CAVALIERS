@@ -1,6 +1,8 @@
-import pygame
-
 # behavior_tree.py
+# Autor: [Julio Antonio Solis]
+# Matrícula: [22-SISN-2-027]
+
+import pygame
 
 class Node:
     def run(self):
@@ -11,6 +13,7 @@ class Selector(Node):
         self.children = children
 
     def run(self):
+        # Ejecuta los nodos hijos hasta que uno tenga éxito
         for child in self.children:
             if child.run():
                 return True
@@ -21,6 +24,7 @@ class Sequence(Node):
         self.children = children
 
     def run(self):
+        # Ejecuta los nodos hijos hasta que uno falle
         for child in self.children:
             if not child.run():
                 return False
@@ -31,6 +35,7 @@ class Action(Node):
         self.func = func
 
     def run(self):
+        # Ejecuta la función asociada a la acción
         return self.func()
 
 class Timer(Node):
@@ -40,6 +45,7 @@ class Timer(Node):
         self.start_time = None
 
     def run(self):
+        # Ejecuta el nodo hijo después de que el temporizador expire
         if self.start_time is None:
             self.start_time = pygame.time.get_ticks()
         current_time = pygame.time.get_ticks()

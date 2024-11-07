@@ -1,4 +1,7 @@
 # game.py
+# Autor: [Julio Antonio Solis]
+# Matrícula: [22-SISN-2-027]
+
 import pygame
 import constantes
 from utils import scalar_imagen

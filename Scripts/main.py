@@ -1,4 +1,7 @@
 # main.py
+# Autor: [Julio Antonio Solis]
+# Matrícula: [22-SISN-2-027]
+
 import pygame
 from inicializar import inicializar_juego
 from game import manejar_colisiones, dibujar_elementos, manejar_eventos, FuenteVida, manejar_colisiones_fuentes
@@ -78,6 +81,7 @@ def reiniciar_juego():
      animaciones_enemigo2, animaciones_ataque_enemigo2, animaciones_enemigo3, animaciones_ataque_enemigo3) = cargar_animaciones()
     world = Mundo(constantes.WIDTH, constantes.HEIGHT, "Assets/MUNDO/battleground2.png")
     Jugador = Personaje(30, 30, animaciones, animaciones_ataque)
+    Jugador.vidas = 15  # Set player lives to 15
     cavalier = Enemigo(170, 125, animaciones_enemigo, animaciones_ataque_enemigo)
     Lanzador = Enemigo(200, 455, animaciones_enemigo2, animaciones_ataque_enemigo2)
     Soldier = Enemigo(480, 600, animaciones_enemigo3, animaciones_ataque_enemigo3)
@@ -114,6 +118,7 @@ def run_game():
     # Inicializar otros elementos del juego
     world = Mundo(constantes.WIDTH, constantes.HEIGHT, "Assets/MUNDO/battleground2.png")
     Jugador = Personaje(30, 30, animaciones, animaciones_ataque)  # Inicializar el jugador
+    Jugador.vidas = 15  # Set player lives to 15
     cavalier = Enemigo(170, 125, animaciones_enemigo, animaciones_ataque_enemigo)  # Inicializar el cavalier
     Lanzador = Enemigo(200, 455, animaciones_enemigo2, animaciones_ataque_enemigo2)  # Inicializar el lanzador
     Soldier = Enemigo(480, 600, animaciones_enemigo3, animaciones_ataque_enemigo3)  # Inicializar el soldier6

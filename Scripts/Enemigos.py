@@ -1,4 +1,7 @@
 # Enemigos.py
+# Autor: [Julio Antonio Solis]
+# Matrícula: [22-SISN-2-027]
+
 import pygame
 import personaje
 import constantes
@@ -8,6 +11,7 @@ from texto_dano import TextoDano
 
 class Enemigo:
     def __init__(self, x, y, animaciones, animaciones_ataque):
+        # Inicialización de atributos
         self.flip = False
         self.jugador = None  # Referencia al jugador
         self.animaciones = animaciones
@@ -22,17 +26,17 @@ class Enemigo:
         self.attack_damage = 5
         self.attack_cooldown = 500
         self.last_attack_time = 0
-        self.attack_range = 5
-
+        self.attack_range = 10
+        
         self.camino = []
         self.velocidad = constantes.Velocidad_Enemigo
         self.jugador = None  # Referencia al jugador
         self.grilla = None  # Referencia a la grilla del mapa
         self.distancia_perseguida = 0  # Distancia que el enemigo ha perseguido al jugador
-        self.distancia_max_persecucion = 600  # Distancia máxima de persecución aumentada
+        self.distancia_max_persecucion = 1700  # Distancia máxima de persecución aumentada
         self.atacando = False
-        self.derrotado = False  # Flag to indicate if the enemy is defeated
-        self.textos_dano = []  # List to store damage texts
+        self.derrotado = False  # Flag para indicar si el enemigo está derrotado
+        self.textos_dano = []  # Lista para almacenar textos de daño
 
         # Definir el árbol de comportamiento
         self.behavior_tree = Selector([
@@ -48,14 +52,14 @@ class Enemigo:
         self.punto_actual = 0
 
     def dibujar(self, interfaz):
-        if not self.derrotado:  # Only draw if the enemy is not defeated
+        if not self.derrotado:  # Solo dibujar si el enemigo no está derrotado
             imagen_flip = pygame.transform.flip(self.image, self.flip, False)
             interfaz.blit(imagen_flip, self.forma)
             pygame.draw.rect(interfaz, (0, 255, 0), self.forma, 2)  # Verde con grosor de 2 píxeles
-            self.draw_textos_dano(interfaz)  # Draw damage texts
+            self.draw_textos_dano(interfaz)  # Dibujar textos de daño
 
     def Update_Frame(self):
-        if not self.derrotado:  # Only update if the enemy is not defeated
+        if not self.derrotado:  # Solo actualizar si el enemigo no está derrotado
             cooldown_animaciones = 100
             if pygame.time.get_ticks() - self.update_time >= cooldown_animaciones:
                 self.frame_index += 1
@@ -71,10 +75,10 @@ class Enemigo:
                     self.frame_index = 0
                 self.image = self.animaciones[self.frame_index]
 
-            self.update_textos_dano()  # Update damage texts
+            self.update_textos_dano()  # Actualizar textos de daño
 
     def movimiento(self, velocidad_x, velocidad_y, grilla):
-        if not self.derrotado:  # Only move if the enemy is not defeated
+        if not self.derrotado:  # Solo mover si el enemigo no está derrotado
             if not self.verificar_colision(grilla, velocidad_x, 0):
                 self.forma.x += velocidad_x
                 if velocidad_x < 0:
@@ -85,7 +89,7 @@ class Enemigo:
                 self.forma.y += velocidad_y
 
     def verificar_colision(self, grilla, dx, dy):
-        if self.derrotado:  # No collision if the enemy is defeated
+        if self.derrotado:  # No hay colisión si el enemigo está derrotado
             return False
         tile_size = constantes.Tile_Size
         enemigo_rect = self.forma.copy()
@@ -107,9 +111,9 @@ class Enemigo:
         self.salud = max(0, self.salud - cantidad)
         if self.salud == 0:
             print("Enemigo derrotado")
-            self.derrotado = True  # Set the flag instead of setting forma to None
+            self.derrotado = True  # Establecer la bandera en lugar de establecer forma a None
 
-        # Add damage text
+        # Agregar texto de daño
         texto_dano = TextoDano(self.forma.centerx, self.forma.centery, cantidad)
         self.textos_dano.append(texto_dano)
 
@@ -124,13 +128,13 @@ class Enemigo:
             texto.draw(screen)
 
     def buscar_camino(self, grilla, objetivo):
-        if not self.derrotado:  # Only search path if the enemy is not defeated
+        if not self.derrotado:  # Solo buscar camino si el enemigo no está derrotado
             inicio = (self.forma.centerx // constantes.Tile_Size, self.forma.centery // constantes.Tile_Size)
             objetivo = (objetivo[0] // constantes.Tile_Size, objetivo[1] // constantes.Tile_Size)
             self.camino = astar(grilla, inicio, objetivo)
 
     def seguir_camino(self):
-        if not self.derrotado and self.camino:  # Only follow path if the enemy is not defeated
+        if not self.derrotado and self.camino:  # Solo seguir camino si el enemigo no está derrotado
             siguiente = self.camino[0]
             dx = siguiente[0] * constantes.Tile_Size + constantes.Tile_Size // 2 - self.forma.centerx
             dy = siguiente[1] * constantes.Tile_Size + constantes.Tile_Size // 2 - self.forma.centery
@@ -143,12 +147,12 @@ class Enemigo:
                 self.movimiento(dx / distancia * max(self.velocidad, 1), dy / distancia * max(self.velocidad, 1), self.grilla)
 
     def detectar_jugador(self):
-        if not self.jugador or self.derrotado:  # Verify that both the enemy and the player exist and the enemy is not defeated
+        if not self.jugador or self.derrotado:  # Verificar que tanto el enemigo como el jugador existan y el enemigo no esté derrotado
             return False
         # Calcular la distancia entre el enemigo y el jugador
         distancia = ((self.forma.centerx - self.jugador.forma.centerx) ** 2 + 
                     (self.forma.centery - self.jugador.forma.centery) ** 2) ** 0.5
-        return distancia < 110  # Distancia de detección ajustada a 110
+        return distancia < 120  # Distancia de detección reducida
 
     def atacar_jugador(self, jugador) -> None:
         if self.derrotado:
@@ -192,8 +196,7 @@ class Enemigo:
 
         self.salud = max(0,self.salud - cantidad)
         if self.salud == 0:
-            print("Enemigo derrotado")
-            self.derrotado = True  # Set the flag instead of setting forma to None
+            self.derrotado = True  # Establecer la bandera en lugar de establecer forma a None
 
     def perseguir_jugador(self):
         # Perseguir al jugador
@@ -228,4 +231,4 @@ class Enemigo:
             self.behavior_tree.run()
             self.ajustar_direccion()  # Ajustar la dirección después de ejecutar el árbol de comportamiento
             if self.jugador and self.detectar_jugador():
-                self.atacar_jugador(self.jugador)   # Atacar al jugador si está cerca
+                self.atacar_jugador(self.jugador)  # Atacar al jugador si está cerca

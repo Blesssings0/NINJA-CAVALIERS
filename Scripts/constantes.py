@@ -1,3 +1,7 @@
+# constantes.py
+# Autor: [Julio Antonio Solis]
+# Matrícula: [22-SISN-2-027]
+
 import pygame
 
 WIDTH = 800
@@ -26,4 +30,4 @@ FILAS = 1
 COLUMNAS = 1
 
 # Añadir constante para la velocidad del enemigo
-Velocidad_Enemigo = 4.6 # Ajusta este valor según sea necesario
+Velocidad_Enemigo =5 # Ajusta este valor según sea necesario

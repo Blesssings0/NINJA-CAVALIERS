@@ -1,1 +1,6 @@
 pygame
+os
+heapq
+
+
+# estas fueron las que estuve utilizando para el proyecto
