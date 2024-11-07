@@ -26,7 +26,7 @@ class Personaje:
         self.sonido_ataque = pygame.mixer.Sound("Assets/Sounds/attack.mp3")
         self.attack_cooldown = 200  # Milisegundos entre ataques
         self.last_attack_time = 0
-        self.attack_range = 50  # Rango de ataque en píxeles
+        self.attack_range = 10  # Rango de ataque en píxeles
         self.attack_damage = 10
         self.derrotado = False  # Indicador de si el jugador está derrotado
 

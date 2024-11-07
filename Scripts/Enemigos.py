@@ -26,7 +26,7 @@ class Enemigo:
         self.attack_damage = 5
         self.attack_cooldown = 500
         self.last_attack_time = 0
-        self.attack_range = 10
+        self.attack_range = 20
         
         self.camino = []
         self.velocidad = constantes.Velocidad_Enemigo
@@ -37,6 +37,7 @@ class Enemigo:
         self.atacando = False
         self.derrotado = False  # Flag para indicar si el enemigo está derrotado
         self.textos_dano = []  # Lista para almacenar textos de daño
+        self.distancia_min_ataque = 10  # Nueva distancia mínima para atacar
 
         # Definir el árbol de comportamiento
         self.behavior_tree = Selector([
@@ -55,7 +56,6 @@ class Enemigo:
         if not self.derrotado:  # Solo dibujar si el enemigo no está derrotado
             imagen_flip = pygame.transform.flip(self.image, self.flip, False)
             interfaz.blit(imagen_flip, self.forma)
-            pygame.draw.rect(interfaz, (0, 255, 0), self.forma, 2)  # Verde con grosor de 2 píxeles
             self.draw_textos_dano(interfaz)  # Dibujar textos de daño
 
     def Update_Frame(self):
@@ -175,6 +175,16 @@ class Enemigo:
             self.atacando = True
             self.last_attack_time = current_time
             jugador.recibir_dano(self.attack_damage, direccion)
+        elif ((dx ** 2 + dy ** 2) ** 0.5) > self.distancia_min_ataque:
+            if dx != 0:
+                mov_x = dx / abs(dx) * self.velocidad
+            else:
+                mov_x = 0
+            if dy != 0:
+                mov_y = dy / abs(dy) * self.velocidad
+            else:
+                mov_y = 0
+            self.movimiento(mov_x, mov_y, self.grilla)  # Moverse hacia el jugador si está cerca pero no lo suficientemente cerca para atacar
 
     def get_attack_hitbox(self, dirreccion : str) -> pygame.Rect:
         attack_hitbox = pygame.Rect(0,0,self.attack_range,self.attack_range)
